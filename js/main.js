@@ -102,7 +102,15 @@ const PHOTOS = [
   'https://assets.htmlacademy.ru/content/intensive/javascript-1/keksobooking/claire-rendall-b6kAwr1i0Iw.jpg',
 ];
 
+const GEOGRAPHIC_COORDINATES = {
+  LAT_MIN: 35.65,
+  LAT_MAX: 35.7,
+  LNG_MIN: 139.7,
+  LNG_MAX: 139.8,
+};
+
 const SIMILAR_OFFERS_COUNT = 10;
+const DECIMALS_OF_GEOGRAPHIC_COORDINATES = 5;
 let avatarCounter = SIMILAR_OFFERS_COUNT + 1;
 
 function getRandomPositiveInteger(min, max) {
@@ -153,8 +161,8 @@ const getRandomArrayElement = (elements) => elements[getRandomPositiveInteger(0,
 function createOffer() {
   avatarCounter--;
 
-  const locationLat = getRandomGeographicCoordinate(35.65, 35.7, 5);
-  const locationLng = getRandomGeographicCoordinate(139.7, 139.8, 5);
+  const locationLat = getRandomGeographicCoordinate(GEOGRAPHIC_COORDINATES.LAT_MIN, GEOGRAPHIC_COORDINATES.LAT_MAX, DECIMALS_OF_GEOGRAPHIC_COORDINATES);
+  const locationLng = getRandomGeographicCoordinate(GEOGRAPHIC_COORDINATES.LNG_MIN, GEOGRAPHIC_COORDINATES.LNG_MAX, DECIMALS_OF_GEOGRAPHIC_COORDINATES);
 
   return {
     author: {
@@ -180,5 +188,7 @@ function createOffer() {
   };
 }
 
-// eslint-disable-next-line no-unused-vars
 const similarOffers = Array.from({ length: SIMILAR_OFFERS_COUNT }, createOffer);
+
+// eslint-disable-next-line no-console
+console.log(similarOffers);
