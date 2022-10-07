@@ -1,4 +1,4 @@
-import { getRandomPositiveInteger, getRandomGeographicCoordinate, getRandomArrayElement } from './util.js';
+import { getRandomPositiveInteger, getRandomGeographicCoordinate, getRandomArrayElement, createIdGenerator } from './util.js';
 
 const TITLES = [
   '1-комн. квартира, 45 м²',
@@ -109,11 +109,11 @@ const GEOGRAPHIC_COORDINATES = {
   LAT_MAX: 35.7,
   LNG_MIN: 139.7,
   LNG_MAX: 139.8,
+  DECIMALS: 5,
 };
 
 const SIMILAR_OFFERS_COUNT = 10;
-const DECIMALS_OF_GEOGRAPHIC_COORDINATES = 5;
-let avatarCounter = SIMILAR_OFFERS_COUNT + 1;
+const generateAvatarId = createIdGenerator();
 
 function createFeatures(length) {
   const features = FEATURES.slice();
@@ -137,10 +137,10 @@ function createPhotos(length) {
 }
 
 function createOffer() {
-  avatarCounter--;
+  const avatarCounter = generateAvatarId();
 
-  const locationLat = getRandomGeographicCoordinate(GEOGRAPHIC_COORDINATES.LAT_MIN, GEOGRAPHIC_COORDINATES.LAT_MAX, DECIMALS_OF_GEOGRAPHIC_COORDINATES);
-  const locationLng = getRandomGeographicCoordinate(GEOGRAPHIC_COORDINATES.LNG_MIN, GEOGRAPHIC_COORDINATES.LNG_MAX, DECIMALS_OF_GEOGRAPHIC_COORDINATES);
+  const locationLat = getRandomGeographicCoordinate(GEOGRAPHIC_COORDINATES.LAT_MIN, GEOGRAPHIC_COORDINATES.LAT_MAX, GEOGRAPHIC_COORDINATES.DECIMALS);
+  const locationLng = getRandomGeographicCoordinate(GEOGRAPHIC_COORDINATES.LNG_MIN, GEOGRAPHIC_COORDINATES.LNG_MAX, GEOGRAPHIC_COORDINATES.DECIMALS);
 
   return {
     author: {
@@ -155,9 +155,9 @@ function createOffer() {
       guests: getRandomPositiveInteger(1, 15),
       checkin: getRandomArrayElement(CHECKS),
       checkout: getRandomArrayElement(CHECKS),
-      features: createFeatures(getRandomPositiveInteger(1, FEATURES.length)),
-      description: getRandomArrayElement(DESCRIPTIONS),
-      photos: createPhotos(getRandomPositiveInteger(1, 10)),
+      features: getRandomPositiveInteger(0, 1) ? createFeatures(getRandomPositiveInteger(1, FEATURES.length)) : [],
+      description: getRandomPositiveInteger(0, 1) ? getRandomArrayElement(DESCRIPTIONS) : '',
+      photos: getRandomPositiveInteger(0, 1) ? createPhotos(getRandomPositiveInteger(1, 10)) : [],
     },
     location: {
       lat: locationLat,
