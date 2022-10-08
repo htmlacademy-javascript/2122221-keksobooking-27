@@ -22,4 +22,22 @@ function getRandomGeographicCoordinate(min, max, decimals) {
 
 const getRandomArrayElement = (elements) => elements[getRandomPositiveInteger(0, elements.length - 1)];
 
-export { getRandomPositiveInteger, getRandomGeographicCoordinate, getRandomArrayElement };
+function createIdGenerator() {
+  let lastGeneratedId = 0;
+
+  return function () {
+    lastGeneratedId++;
+    return lastGeneratedId;
+  };
+}
+
+function declineNumerals(value, words) {
+  const remainderOfDivisionBy100 = Math.abs(value) % 100;
+  const remainderOfDivisionBy10 = remainderOfDivisionBy100 % 10;
+  if (remainderOfDivisionBy100 > 10 && remainderOfDivisionBy100 < 20) { return words[2]; }
+  if (remainderOfDivisionBy10 > 1 && remainderOfDivisionBy10 < 5) { return words[1]; }
+  if (remainderOfDivisionBy10 === 1) { return words[0]; }
+  return words[2];
+}
+
+export { getRandomPositiveInteger, getRandomGeographicCoordinate, getRandomArrayElement, createIdGenerator, declineNumerals };

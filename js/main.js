@@ -1,5 +1,2 @@
-import { createOffers } from './data.js';
+import './popup.js';
 import './form.js';
-
-// eslint-disable-next-line no-console
-console.log(createOffers());
