@@ -2,6 +2,7 @@ const mapFilters = document.querySelector('.map__filters');
 const adForm = document.querySelector('.ad-form');
 const type = document.querySelector('#type');
 const price = document.querySelector('#price');
+const slider = document.querySelector('.ad-form__slider');
 const timein = document.querySelector('#timein');
 const timeout = document.querySelector('#timeout');
 const roomNumber = adForm.querySelector('#room_number');
@@ -45,11 +46,13 @@ function disableElement(element) {
 function deactivatePage() {
   disableElement(mapFilters);
   disableElement(adForm);
+  slider.setAttribute('disabled', true);
 }
 
 function activatePage() {
   enableElement(mapFilters);
   enableElement(adForm);
+  slider.removeAttribute('disabled');
 }
 
 function validateAccommodation() {
@@ -93,5 +96,28 @@ adForm.addEventListener('submit', (evt) => {
   pristine.validate();
 });
 
+noUiSlider.create(slider, {
+  range: {
+    min: 0,
+    max: 100000,
+  },
+  start: 5000,
+  step: 1,
+  connect: 'lower',
+  format: {
+    to: function (value) {
+      return value.toFixed(0);
+    },
+    from: function (value) {
+      return parseFloat(value);
+    },
+  },
+});
+
+slider.noUiSlider.on('update', () => {
+  price.value = slider.noUiSlider.get();
+});
+
 deactivatePage();
-activatePage();
+
+export { activatePage };

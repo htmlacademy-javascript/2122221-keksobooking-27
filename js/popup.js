@@ -1,4 +1,3 @@
-import { createOffers } from './data.js';
 import { declineNumerals } from './util.js';
 
 const TYPES_RUS = {
@@ -9,16 +8,14 @@ const TYPES_RUS = {
   hotel: 'Отель',
 };
 
-const mapCanvas = document.querySelector('#map-canvas');
 const offerTemplate = document.querySelector('#card')
   .content
   .querySelector('.popup');
 
-const offers = createOffers();
-const offersListFragment = document.createDocumentFragment();
-
-offers.forEach(({ author, offer }) => {
+function createCustomPopup(point) {
+  const { author, offer } = point;
   const offerElement = offerTemplate.cloneNode(true);
+
   offerElement.querySelector('.popup__avatar').src = author.avatar;
   offerElement.querySelector('.popup__title').textContent = offer.title;
   offerElement.querySelector('.popup__text--address').textContent = offer.address;
@@ -67,7 +64,7 @@ offers.forEach(({ author, offer }) => {
     photosList.remove();
   }
 
-  offersListFragment.appendChild(offerElement);
-});
+  return offerElement;
+}
 
-mapCanvas.appendChild(offersListFragment.children[0]);
+export { createCustomPopup };
