@@ -1,5 +1,9 @@
 const mapFilters = document.querySelector('.map__filters');
 const adForm = document.querySelector('.ad-form');
+const type = document.querySelector('#type');
+const price = document.querySelector('#price');
+const timein = document.querySelector('#timein');
+const timeout = document.querySelector('#timeout');
 const roomNumber = adForm.querySelector('#room_number');
 const capacity = adForm.querySelector('#capacity');
 
@@ -10,34 +14,42 @@ const accommodationOption = {
   '100': ['0'],
 };
 
+const minCostOfTypes = {
+  bungalow: 0,
+  flat: 1000,
+  hotel: 3000,
+  house: 5000,
+  palace: 10000,
+};
+
 const pristine = new Pristine(adForm, {
   classTo: 'ad-form__element',
   errorClass: 'ad-form__element--invalid',
   errorTextParent: 'ad-form__element',
 });
 
-function deactivatePage() {
-  mapFilters.classList.add('map__filters--disabled');
-  for (const item of mapFilters.children) {
-    item.disabled = true;
+function enableElement(element) {
+  element.classList.remove(`${element.classList[0]}--disabled`);
+  for (const item of element.children) {
+    item.disabled = false;
   }
+}
 
-  adForm.classList.add('ad-form--disabled');
-  for (const item of adForm.children) {
+function disableElement(element) {
+  element.classList.add(`${element.classList[0]}--disabled`);
+  for (const item of element.children) {
     item.disabled = true;
   }
 }
 
-function activatePage() {
-  mapFilters.classList.remove('map__filters--disabled');
-  for (const item of mapFilters.children) {
-    item.disabled = false;
-  }
+function deactivatePage() {
+  disableElement(mapFilters);
+  disableElement(adForm);
+}
 
-  adForm.classList.remove('ad-form--disabled');
-  for (const item of adForm.children) {
-    item.disabled = false;
-  }
+function activatePage() {
+  enableElement(mapFilters);
+  enableElement(adForm);
 }
 
 function validateAccommodation() {
@@ -51,6 +63,29 @@ function getAccommodationErrorMessage() {
 pristine.addValidator(roomNumber, validateAccommodation, getAccommodationErrorMessage);
 
 capacity.addEventListener('change', () => pristine.validate(roomNumber));
+
+function validateMinPrice() {
+  return minCostOfTypes[type.value] <= price.value;
+}
+
+function getMinPriceErrorMessage() {
+  return `Минимальная цена для выбранного типа жилья ${minCostOfTypes[type.value]}`;
+}
+
+pristine.addValidator(price, validateMinPrice, getMinPriceErrorMessage);
+
+type.addEventListener('change', () => {
+  price.placeholder = minCostOfTypes[type.value];
+  pristine.validate(price);
+});
+
+timein.addEventListener('change', () => {
+  timeout.value = timein.value;
+});
+
+timeout.addEventListener('change', () => {
+  timein.value = timeout.value;
+});
 
 adForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
