@@ -1,3 +1,8 @@
+import { sendData } from './api.js';
+import { showMessage } from './message.js';
+import { enableElement, disableElement } from './util.js';
+import { setSpecialMarker, closePopups, setDefaultMapView } from './map.js';
+
 const mapFilters = document.querySelector('.map__filters');
 const adForm = document.querySelector('.ad-form');
 const type = document.querySelector('#type');
@@ -7,6 +12,8 @@ const timein = document.querySelector('#timein');
 const timeout = document.querySelector('#timeout');
 const roomNumber = adForm.querySelector('#room_number');
 const capacity = adForm.querySelector('#capacity');
+const submitButton = adForm.querySelector('.ad-form__submit');
+const resetButton = adForm.querySelector('.ad-form__reset');
 
 const accommodationOption = {
   '1': ['1'],
@@ -29,30 +36,34 @@ const pristine = new Pristine(adForm, {
   errorTextParent: 'ad-form__element',
 });
 
-function enableElement(element) {
-  element.classList.remove(`${element.classList[0]}--disabled`);
-  for (const item of element.children) {
-    item.disabled = false;
-  }
-}
-
-function disableElement(element) {
-  element.classList.add(`${element.classList[0]}--disabled`);
-  for (const item of element.children) {
-    item.disabled = true;
-  }
-}
-
-function deactivatePage() {
+function disableFilters() {
   disableElement(mapFilters);
+}
+
+function enableFilters() {
+  enableElement(mapFilters);
+}
+
+function disableForm() {
   disableElement(adForm);
   slider.setAttribute('disabled', true);
 }
 
-function activatePage() {
-  enableElement(mapFilters);
+function enableForm() {
   enableElement(adForm);
   slider.removeAttribute('disabled');
+}
+
+function onResetButtonClick(evt) {
+  evt.preventDefault();
+  resetForm();
+}
+
+function resetForm() {
+  adForm.reset();
+  setSpecialMarker();
+  closePopups();
+  setDefaultMapView();
 }
 
 function validateAccommodation() {
@@ -93,8 +104,25 @@ timeout.addEventListener('change', () => {
 adForm.addEventListener('submit', (evt) => {
   evt.preventDefault();
 
-  pristine.validate();
+  const isValid = pristine.validate();
+  if (isValid) {
+    submitButton.disabled = true;
+    sendData(
+      () => {
+        showMessage('success');
+        submitButton.disabled = false;
+        resetForm();
+      },
+      () => {
+        showMessage('error');
+        submitButton.disabled = false;
+      },
+      new FormData(evt.target)
+    );
+  }
 });
+
+resetButton.addEventListener('click', (evt) => onResetButtonClick(evt));
 
 noUiSlider.create(slider, {
   range: {
@@ -118,6 +146,7 @@ slider.noUiSlider.on('update', () => {
   price.value = slider.noUiSlider.get();
 });
 
-deactivatePage();
+disableFilters();
+disableForm();
 
-export { activatePage };
+export { enableFilters, enableForm };
