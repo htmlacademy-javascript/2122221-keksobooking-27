@@ -40,4 +40,18 @@ function declineNumerals(value, words) {
   return words[2];
 }
 
-export { getRandomPositiveInteger, getRandomGeographicCoordinate, getRandomArrayElement, createIdGenerator, declineNumerals };
+function enableElement(element) {
+  element.classList.remove(`${element.classList[0]}--disabled`);
+  for (const item of element.children) {
+    item.disabled = false;
+  }
+}
+
+function disableElement(element) {
+  element.classList.add(`${element.classList[0]}--disabled`);
+  for (const item of element.children) {
+    item.disabled = true;
+  }
+}
+
+export { getRandomPositiveInteger, getRandomGeographicCoordinate, getRandomArrayElement, createIdGenerator, declineNumerals, enableElement, disableElement };

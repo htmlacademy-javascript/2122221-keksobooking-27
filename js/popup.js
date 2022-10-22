@@ -29,7 +29,7 @@ function createCustomPopup(point) {
   offerElement.querySelector('.popup__text--time').textContent = `Заезд после ${offer.checkin}, выезд до ${offer.checkout}`;
 
   const featuresContainer = offerElement.querySelector('.popup__features');
-  if (offer.features.length) {
+  if (offer.features) {
     const featuresList = featuresContainer.querySelectorAll('.popup__feature');
     featuresList.forEach((featuresListItem) => {
       const isNecessary = offer.features.some(
@@ -45,14 +45,14 @@ function createCustomPopup(point) {
   }
 
   const offerDescription = offerElement.querySelector('.popup__description');
-  if (offer.description.length) {
+  if (offer.description) {
     offerDescription.textContent = offer.description;
   } else {
     offerDescription.remove();
   }
 
   const photosList = offerElement.querySelector('.popup__photos');
-  if (offer.photos.length) {
+  if (offer.photos) {
     const photosListItem = photosList.querySelector('.popup__photo');
     photosListItem.remove();
     for (let i = 0; i < offer.photos.length; i++) {

@@ -1,32 +1,21 @@
-import { createOffers } from './data.js';
+import { getData } from './api.js';
 import { createCustomPopup } from './popup.js';
-import { activatePage } from './form.js';
+import { enableForm } from './form.js';
+import { enableFilters } from './form.js';
+import { showAlert } from './message.js';
+
+const SIMILAR_OFFERS_COUNT = 10;
 
 const address = document.querySelector('#address');
-const offers = createOffers();
 
 const CITY_CENTER_COORDINATES = {
   LAT: 35.681729,
   LNG: 139.753927,
 };
 
-const mapZoom = 12;
-
-const map = L.map('map-canvas')
-  .on('load', () => {
-    activatePage();
-  })
-  .setView({
-    lat: CITY_CENTER_COORDINATES.LAT,
-    lng: CITY_CENTER_COORDINATES.LNG,
-  }, mapZoom);
-
-L.tileLayer(
-  'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
-  {
-    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
-  },
-).addTo(map);
+const map = L.map('map-canvas');
+const markerGroup = L.layerGroup().addTo(map);
+const MAP_ZOOM = 12;
 
 const specialPinIcon = L.icon({
   iconUrl: '../img/main-pin.svg',
@@ -51,7 +40,30 @@ const similarPinIcon = L.icon({
   iconAnchor: [20, 40],
 });
 
-const markerGroup = L.layerGroup().addTo(map);
+function setDefaultMapView() {
+  map.setView({
+    lat: CITY_CENTER_COORDINATES.LAT,
+    lng: CITY_CENTER_COORDINATES.LNG,
+  }, MAP_ZOOM);
+}
+
+function createSpecialMarker() {
+  specialPinMarker.addTo(map);
+  setSpecialMarker();
+
+  specialPinMarker.on('moveend', (evt) => {
+    const coordinates = evt.target.getLatLng();
+    setSpecialMarker(coordinates.lat, coordinates.lng);
+  });
+}
+
+function setSpecialMarker(lat = CITY_CENTER_COORDINATES.LAT, lng = CITY_CENTER_COORDINATES.LNG) {
+  specialPinMarker.setLatLng({
+    lat,
+    lng,
+  });
+  address.value = `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+}
 
 function createSimilarMarker(point) {
   const { location } = point;
@@ -70,13 +82,46 @@ function createSimilarMarker(point) {
     .bindPopup(createCustomPopup(point));
 }
 
-specialPinMarker.addTo(map);
+function createSimilarMarkers() {
+  getData((data) => {
+    const offers = data.slice(0, SIMILAR_OFFERS_COUNT);
+    offers.forEach((point) => {
+      createSimilarMarker(point, map);
+    });
+    enableFilters();
+  }, () => {
+    showAlert('При попытке загрузить похожие объявления произошла ошибка');
+  });
+}
 
-specialPinMarker.on('moveend', (evt) => {
-  const coordinates = evt.target.getLatLng();
-  address.value = `${coordinates.lat.toFixed(5)}, ${coordinates.lng.toFixed(5)}`;
+function closePopups() {
+  for (const layer of markerGroup.getLayers()) {
+    const popup = layer.getPopup();
+    if (popup.isOpen()) {
+      layer.closePopup();
+    }
+  }
+}
+
+const createTileLayers = new Promise((resolve, reject) => {
+  setDefaultMapView();
+
+  L.tileLayer(
+    'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {
+      attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors',
+    },
+  ).addTo(map)
+    .on('tileerror', () => reject())
+    .on('load', () => resolve());
 });
 
-offers.forEach((point) => {
-  createSimilarMarker(point);
-});
+createTileLayers
+  .then(() => {
+    createSpecialMarker();
+    enableForm();
+    createSimilarMarkers();
+  })
+  .catch(() => showAlert('При загрузке карты произошла ошибка'));
+
+export { setSpecialMarker, closePopups, setDefaultMapView };
