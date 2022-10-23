@@ -3,7 +3,6 @@ import { showMessage } from './message.js';
 import { enableElement, disableElement } from './util.js';
 import { setSpecialMarker, closePopups, setDefaultMapView } from './map.js';
 
-const mapFilters = document.querySelector('.map__filters');
 const adForm = document.querySelector('.ad-form');
 const type = document.querySelector('#type');
 const price = document.querySelector('#price');
@@ -35,14 +34,6 @@ const pristine = new Pristine(adForm, {
   errorClass: 'ad-form__element--invalid',
   errorTextParent: 'ad-form__element',
 });
-
-function disableFilters() {
-  disableElement(mapFilters);
-}
-
-function enableFilters() {
-  enableElement(mapFilters);
-}
 
 function disableForm() {
   disableElement(adForm);
@@ -146,7 +137,6 @@ slider.noUiSlider.on('update', () => {
   price.value = slider.noUiSlider.get();
 });
 
-disableFilters();
 disableForm();
 
-export { enableFilters, enableForm };
+export { enableForm };
