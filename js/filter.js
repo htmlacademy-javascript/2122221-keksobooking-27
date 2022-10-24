@@ -7,7 +7,7 @@ const housingRooms = mapFilters.querySelector('#housing-rooms');
 const housingGuests = mapFilters.querySelector('#housing-guests');
 const housingFeatures = mapFilters.querySelector('#housing-features').querySelectorAll('input');
 
-const selects = [housingType, housingPrice, housingRooms, housingGuests];
+const dropdownFilters = [housingType, housingPrice, housingRooms, housingGuests];
 
 function disableFilters() {
   disableElement(mapFilters);
@@ -20,9 +20,9 @@ function enableFilters() {
 function filterOffer(item) {
   let isMatching = true;
 
-  for (const select of selects) {
-    if (select.value !== 'any') {
-      switch (select) {
+  for (const dropdownFilter of dropdownFilters) {
+    if (dropdownFilter.value !== 'any') {
+      switch (dropdownFilter) {
 
         case housingType:
           isMatching *= item.offer.type === housingType.value;

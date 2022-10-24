@@ -1,3 +1,5 @@
+import { createCloseButton } from './util.js';
+
 let messageElement;
 const ALERT_SHOW_TIME = 5000;
 
@@ -42,18 +44,7 @@ function showAlert(text) {
   alertElement.style.borderRadius = '8px';
   alertElement.textContent = text;
 
-  const closeButton = document.createElement('button');
-  closeButton.type = 'button';
-  closeButton.style.position = 'absolute';
-  closeButton.style.top = 0;
-  closeButton.style.right = 0;
-  closeButton.style.padding = '4px';
-  closeButton.style.border = 'none';
-  closeButton.style.font = '16px/14px Tahoma, Verdana, sans-serif';
-  closeButton.style.color = 'white';
-  closeButton.style.backgroundColor = 'transparent';
-  closeButton.textContent = '×';
-
+  const closeButton = createCloseButton();
   alertElement.append(closeButton);
   alertContainer.append(alertElement);
 

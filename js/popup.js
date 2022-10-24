@@ -16,7 +16,10 @@ function createCustomPopup(point) {
   const { author, offer } = point;
   const offerElement = offerTemplate.cloneNode(true);
 
-  offerElement.querySelector('.popup__avatar').src = author.avatar;
+  if (author.avatar) {
+    offerElement.querySelector('.popup__avatar').src = author.avatar;
+  }
+
   offerElement.querySelector('.popup__title').textContent = offer.title;
   offerElement.querySelector('.popup__text--address').textContent = offer.address;
   offerElement.querySelector('[data-price]').textContent = offer.price;
