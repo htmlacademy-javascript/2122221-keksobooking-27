@@ -1,8 +1,9 @@
 import { getData } from './api.js';
 import { createCustomPopup } from './popup.js';
 import { enableForm } from './form.js';
-import { enableFilters } from './form.js';
 import { showAlert } from './message.js';
+import { enableFilters, filterOffer, setFilterChange } from './filter.js';
+import { debounce } from './util.js';
 
 const SIMILAR_OFFERS_COUNT = 10;
 
@@ -18,7 +19,7 @@ const markerGroup = L.layerGroup().addTo(map);
 const MAP_ZOOM = 12;
 
 const specialPinIcon = L.icon({
-  iconUrl: '../img/main-pin.svg',
+  iconUrl: './img/main-pin.svg',
   iconSize: [52, 52],
   iconAnchor: [26, 52],
 });
@@ -35,7 +36,7 @@ const specialPinMarker = L.marker(
 );
 
 const similarPinIcon = L.icon({
-  iconUrl: '../img/pin.svg',
+  iconUrl: './img/pin.svg',
   iconSize: [40, 40],
   iconAnchor: [20, 40],
 });
@@ -82,13 +83,21 @@ function createSimilarMarker(point) {
     .bindPopup(createCustomPopup(point));
 }
 
-function createSimilarMarkers() {
-  getData((data) => {
-    const offers = data.slice(0, SIMILAR_OFFERS_COUNT);
-    offers.forEach((point) => {
+function createSimilarMarkers(offers) {
+  markerGroup.clearLayers();
+  offers
+    .filter(filterOffer)
+    .slice(0, SIMILAR_OFFERS_COUNT)
+    .forEach((point) => {
       createSimilarMarker(point, map);
     });
+}
+
+function getSimilarOffers() {
+  getData((offers) => {
+    createSimilarMarkers(offers);
     enableFilters();
+    setFilterChange(debounce(() => createSimilarMarkers(offers)));
   }, () => {
     showAlert('При попытке загрузить похожие объявления произошла ошибка');
   });
@@ -120,7 +129,7 @@ createTileLayers
   .then(() => {
     createSpecialMarker();
     enableForm();
-    createSimilarMarkers();
+    getSimilarOffers();
   })
   .catch(() => showAlert('При загрузке карты произошла ошибка'));
 
