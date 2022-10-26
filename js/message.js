@@ -53,7 +53,6 @@ function showAlert(text) {
   closeButton.style.color = 'white';
   closeButton.style.backgroundColor = 'transparent';
   closeButton.textContent = '×';
-
   alertElement.append(closeButton);
   alertContainer.append(alertElement);
 

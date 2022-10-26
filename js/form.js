@@ -3,14 +3,21 @@ import { showMessage } from './message.js';
 import { enableElement, disableElement } from './util.js';
 import { setSpecialMarker, closePopups, setDefaultMapView } from './map.js';
 
+const FYLE_TYPES = ['jpg', 'jpeg', 'png'];
+
 const adForm = document.querySelector('.ad-form');
-const type = document.querySelector('#type');
-const price = document.querySelector('#price');
-const slider = document.querySelector('.ad-form__slider');
-const timein = document.querySelector('#timein');
-const timeout = document.querySelector('#timeout');
+const avatarChooser = adForm.querySelector('#avatar');
+const avatarPreview = adForm.querySelector('.ad-form-header__preview img');
+const avatarPreviewPlaceholderSrc = avatarPreview.src;
+const type = adForm.querySelector('#type');
+const price = adForm.querySelector('#price');
+const slider = adForm.querySelector('.ad-form__slider');
+const timein = adForm.querySelector('#timein');
+const timeout = adForm.querySelector('#timeout');
 const roomNumber = adForm.querySelector('#room_number');
 const capacity = adForm.querySelector('#capacity');
+const photoChooser = adForm.querySelector('#images');
+const photoPlaceholder = adForm.querySelector('.ad-form__photo');
 const submitButton = adForm.querySelector('.ad-form__submit');
 const resetButton = adForm.querySelector('.ad-form__reset');
 
@@ -52,6 +59,16 @@ function onResetButtonClick(evt) {
 
 function resetForm() {
   adForm.reset();
+
+  if (avatarPreview.src !== avatarPreviewPlaceholderSrc) {
+    avatarPreview.src = avatarPreviewPlaceholderSrc;
+  }
+
+  const housingPhoto = photoPlaceholder.querySelector('img');
+  if (housingPhoto) {
+    housingPhoto.remove();
+  }
+
   setSpecialMarker();
   closePopups();
   setDefaultMapView();
@@ -65,10 +82,6 @@ function getAccommodationErrorMessage() {
   return 'Выбранное количество гостей недопустимо для выбранного количества комнат';
 }
 
-pristine.addValidator(roomNumber, validateAccommodation, getAccommodationErrorMessage);
-
-capacity.addEventListener('change', () => pristine.validate(roomNumber));
-
 function validateMinPrice() {
   return minCostOfTypes[type.value] <= price.value;
 }
@@ -76,6 +89,49 @@ function validateMinPrice() {
 function getMinPriceErrorMessage() {
   return `Минимальная цена для выбранного типа жилья ${minCostOfTypes[type.value]}`;
 }
+
+function checkImageType(file) {
+  const fileName = file.name.toLowerCase();
+  const matches = FYLE_TYPES.some((fileType) => fileName.endsWith(fileType));
+  return matches;
+}
+
+avatarChooser.addEventListener('change', () => {
+  if (avatarChooser.files.length > 0) {
+    const file = avatarChooser.files[0];
+
+    if (checkImageType(file)) {
+      avatarPreview.src = URL.createObjectURL(file);
+      avatarPreview.style.objectFit = 'cover';
+    }
+  }
+});
+
+photoChooser.addEventListener('change', () => {
+  if (photoChooser.files.length > 0) {
+    const file = photoChooser.files[0];
+
+    if (checkImageType(file)) {
+      const previousUploadedImage = photoPlaceholder.querySelector('img');
+
+      if (previousUploadedImage) {
+        previousUploadedImage.src = URL.createObjectURL(file);
+      } else {
+        const photoPreview = document.createElement('img');
+        photoPreview.src = URL.createObjectURL(file);
+        photoPreview.alt = 'Фотография жилья';
+        photoPreview.width = '70';
+        photoPreview.height = '70';
+        photoPreview.style.objectFit = 'cover';
+        photoPlaceholder.append(photoPreview);
+      }
+    }
+  }
+});
+
+pristine.addValidator(roomNumber, validateAccommodation, getAccommodationErrorMessage);
+
+capacity.addEventListener('change', () => pristine.validate(roomNumber));
 
 pristine.addValidator(price, validateMinPrice, getMinPriceErrorMessage);
 
