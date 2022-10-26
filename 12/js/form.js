@@ -1,14 +1,13 @@
 import { sendData } from './api.js';
 import { showMessage } from './message.js';
-import { enableElement, disableElement, createCloseButton } from './util.js';
+import { enableElement, disableElement } from './util.js';
 import { setSpecialMarker, closePopups, setDefaultMapView } from './map.js';
 
 const FYLE_TYPES = ['jpg', 'jpeg', 'png'];
 
 const adForm = document.querySelector('.ad-form');
 const avatarChooser = adForm.querySelector('#avatar');
-const avatarPreviewContainer = adForm.querySelector('.ad-form-header__preview');
-const avatarPreview = avatarPreviewContainer.querySelector('img');
+const avatarPreview = adForm.querySelector('.ad-form-header__preview img');
 const avatarPreviewPlaceholderSrc = avatarPreview.src;
 const type = adForm.querySelector('#type');
 const price = adForm.querySelector('#price');
@@ -18,8 +17,7 @@ const timeout = adForm.querySelector('#timeout');
 const roomNumber = adForm.querySelector('#room_number');
 const capacity = adForm.querySelector('#capacity');
 const photoChooser = adForm.querySelector('#images');
-const photosList = adForm.querySelector('.ad-form__photo-container');
-const photoPlaceholder = photosList.querySelector('.ad-form__photo');
+const photoPlaceholder = adForm.querySelector('.ad-form__photo');
 const submitButton = adForm.querySelector('.ad-form__submit');
 const resetButton = adForm.querySelector('.ad-form__reset');
 
@@ -63,12 +61,12 @@ function resetForm() {
   adForm.reset();
 
   if (avatarPreview.src !== avatarPreviewPlaceholderSrc) {
-    deleteAvatar();
+    avatarPreview.src = avatarPreviewPlaceholderSrc;
   }
 
-  const photoContainers = photosList.querySelectorAll('.ad-form__photo');
-  for (let i = 0; i < photoContainers.length - 1; i++) {
-    deletePhoto(photoContainers[i]);
+  const housingPhoto = photoPlaceholder.querySelector('img');
+  if (housingPhoto) {
+    housingPhoto.remove();
   }
 
   setSpecialMarker();
@@ -98,15 +96,6 @@ function checkImageType(file) {
   return matches;
 }
 
-function deleteAvatar() {
-  avatarPreview.src = avatarPreviewPlaceholderSrc;
-  avatarPreviewContainer.querySelector('button').remove();
-}
-
-function deletePhoto(photoPreviewContainer) {
-  photoPreviewContainer.remove();
-}
-
 avatarChooser.addEventListener('change', () => {
   if (avatarChooser.files.length > 0) {
     const file = avatarChooser.files[0];
@@ -114,40 +103,27 @@ avatarChooser.addEventListener('change', () => {
     if (checkImageType(file)) {
       avatarPreview.src = URL.createObjectURL(file);
       avatarPreview.style.objectFit = 'cover';
-
-      avatarPreviewContainer.style.position = 'relative';
-
-      if (!avatarPreviewContainer.querySelector('button')) {
-        const closeButton = createCloseButton('black', '2px');
-        avatarPreviewContainer.append(closeButton);
-        closeButton.addEventListener('click', deleteAvatar);
-      }
     }
   }
 });
 
 photoChooser.addEventListener('change', () => {
   if (photoChooser.files.length > 0) {
-    const files = photoChooser.files;
+    const file = photoChooser.files[0];
 
-    for (const file of files) {
-      if (checkImageType(file)) {
+    if (checkImageType(file)) {
+      const previousUploadedImage = photoPlaceholder.querySelector('img');
+
+      if (previousUploadedImage) {
+        previousUploadedImage.src = URL.createObjectURL(file);
+      } else {
         const photoPreview = document.createElement('img');
         photoPreview.src = URL.createObjectURL(file);
         photoPreview.alt = 'Фотография жилья';
         photoPreview.width = '70';
         photoPreview.height = '70';
         photoPreview.style.objectFit = 'cover';
-
-        const photoPreviewContainer = photoPlaceholder.cloneNode('true');
-        photoPreviewContainer.append(photoPreview);
-        photoPlaceholder.before(photoPreviewContainer);
-
-        photoPreviewContainer.style.position = 'relative';
-
-        const closeButton = createCloseButton('black', '2px');
-        photoPreviewContainer.append(closeButton);
-        closeButton.addEventListener('click', () => deletePhoto(photoPreviewContainer));
+        photoPlaceholder.append(photoPreview);
       }
     }
   }

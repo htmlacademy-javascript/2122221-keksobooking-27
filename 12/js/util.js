@@ -63,19 +63,4 @@ function debounce(callback, timeoutDelay = 500) {
   };
 }
 
-function createCloseButton(color = 'white', padding = '4px') {
-  const closeButton = document.createElement('button');
-  closeButton.type = 'button';
-  closeButton.style.position = 'absolute';
-  closeButton.style.top = 0;
-  closeButton.style.right = 0;
-  closeButton.style.padding = padding;
-  closeButton.style.border = 'none';
-  closeButton.style.font = '16px/14px Tahoma, Verdana, sans-serif';
-  closeButton.style.color = color;
-  closeButton.style.backgroundColor = 'transparent';
-  closeButton.textContent = '×';
-  return closeButton;
-}
-
-export { getRandomPositiveInteger, getRandomGeographicCoordinate, getRandomArrayElement, createIdGenerator, declineNumerals, enableElement, disableElement, debounce, createCloseButton };
+export { getRandomPositiveInteger, getRandomGeographicCoordinate, getRandomArrayElement, createIdGenerator, declineNumerals, enableElement, disableElement, debounce };
