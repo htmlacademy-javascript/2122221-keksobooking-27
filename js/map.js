@@ -9,7 +9,7 @@ const SIMILAR_OFFERS_COUNT = 10;
 
 const address = document.querySelector('#address');
 
-const CITY_CENTER_COORDINATES = {
+const CityCenterCoordinates = {
   LAT: 35.681729,
   LNG: 139.753927,
 };
@@ -26,8 +26,8 @@ const specialPinIcon = L.icon({
 
 const specialPinMarker = L.marker(
   {
-    lat: CITY_CENTER_COORDINATES.LAT,
-    lng: CITY_CENTER_COORDINATES.LNG,
+    lat: CityCenterCoordinates.LAT,
+    lng: CityCenterCoordinates.LNG,
   },
   {
     icon: specialPinIcon,
@@ -43,8 +43,8 @@ const similarPinIcon = L.icon({
 
 function setDefaultMapView() {
   map.setView({
-    lat: CITY_CENTER_COORDINATES.LAT,
-    lng: CITY_CENTER_COORDINATES.LNG,
+    lat: CityCenterCoordinates.LAT,
+    lng: CityCenterCoordinates.LNG,
   }, MAP_ZOOM);
 }
 
@@ -58,7 +58,7 @@ function createSpecialMarker() {
   });
 }
 
-function setSpecialMarker(lat = CITY_CENTER_COORDINATES.LAT, lng = CITY_CENTER_COORDINATES.LNG) {
+function setSpecialMarker(lat = CityCenterCoordinates.LAT, lng = CityCenterCoordinates.LNG) {
   specialPinMarker.setLatLng({
     lat,
     lng,
@@ -85,12 +85,22 @@ function createSimilarMarker(point) {
 
 function createSimilarMarkers(offers) {
   markerGroup.clearLayers();
-  offers
-    .filter(filterOffer)
-    .slice(0, SIMILAR_OFFERS_COUNT)
-    .forEach((point) => {
-      createSimilarMarker(point, map);
-    });
+
+  let counter = 0;
+  const filteredOffers = [];
+
+  for (let i = 0; i < offers.length; i++) {
+    if (filterOffer(offers[i])) {
+      filteredOffers.push(offers[i]);
+      counter++;
+    }
+
+    if (counter === SIMILAR_OFFERS_COUNT) {
+      break;
+    }
+  }
+
+  filteredOffers.forEach((point) => createSimilarMarker(point, map));
 }
 
 function getSimilarOffers() {
@@ -101,15 +111,6 @@ function getSimilarOffers() {
   }, () => {
     showAlert('При попытке загрузить похожие объявления произошла ошибка');
   });
-}
-
-function closePopups() {
-  for (const layer of markerGroup.getLayers()) {
-    const popup = layer.getPopup();
-    if (popup.isOpen()) {
-      layer.closePopup();
-    }
-  }
 }
 
 const createTileLayers = new Promise((resolve, reject) => {
@@ -133,4 +134,4 @@ createTileLayers
   })
   .catch(() => showAlert('При загрузке карты произошла ошибка'));
 
-export { setSpecialMarker, closePopups, setDefaultMapView };
+export { setSpecialMarker, setDefaultMapView };

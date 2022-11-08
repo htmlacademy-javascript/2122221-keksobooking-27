@@ -1,4 +1,4 @@
-import { declineNumerals } from './util.js';
+import { declineWordAccordingToNumber } from './util.js';
 
 const TYPES_RUS = {
   flat: 'Квартира',
@@ -25,8 +25,8 @@ function createCustomPopup(point) {
   offerElement.querySelector('[data-price]').textContent = offer.price;
   offerElement.querySelector('.popup__type').textContent = TYPES_RUS[offer.type];
 
-  const declinedRooms = declineNumerals(offer.rooms, ['комната', 'комнаты', 'комнат']);
-  const declinedGuests = declineNumerals(offer.guests, ['гостя', 'гостей', 'гостей']);
+  const declinedRooms = declineWordAccordingToNumber(offer.rooms, ['комната', 'комнаты', 'комнат']);
+  const declinedGuests = declineWordAccordingToNumber(offer.guests, ['гостя', 'гостей', 'гостей']);
   offerElement.querySelector('.popup__text--capacity').textContent = `${offer.rooms} ${declinedRooms} для ${offer.guests} ${declinedGuests}`;
 
   offerElement.querySelector('.popup__text--time').textContent = `Заезд после ${offer.checkin}, выезд до ${offer.checkout}`;

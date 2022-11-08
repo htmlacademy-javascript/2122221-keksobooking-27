@@ -1,9 +1,11 @@
 import { sendData } from './api.js';
 import { showMessage } from './message.js';
 import { enableElement, disableElement } from './util.js';
-import { setSpecialMarker, closePopups, setDefaultMapView } from './map.js';
+import { setSpecialMarker, setDefaultMapView } from './map.js';
+import { resetFilters } from './filter.js';
 
 const FYLE_TYPES = ['jpg', 'jpeg', 'png'];
+const SLIDER_START_VALUE = 5000;
 
 const adForm = document.querySelector('.ad-form');
 const avatarChooser = adForm.querySelector('#avatar');
@@ -69,9 +71,13 @@ function resetForm() {
     housingPhoto.remove();
   }
 
+  slider.noUiSlider.set(SLIDER_START_VALUE);
+  pristine.reset();
+
   setSpecialMarker();
-  closePopups();
   setDefaultMapView();
+
+  resetFilters();
 }
 
 function validateAccommodation() {
@@ -176,7 +182,7 @@ noUiSlider.create(slider, {
     min: 0,
     max: 100000,
   },
-  start: 5000,
+  start: SLIDER_START_VALUE,
   step: 1,
   connect: 'lower',
   format: {
