@@ -9,6 +9,11 @@ const housingFeatures = mapFilters.querySelector('#housing-features').querySelec
 
 const dropdownFilters = [housingType, housingPrice, housingRooms, housingGuests];
 
+const PriceLimits = {
+  LOW: 10000,
+  MIDDLE: 50000,
+};
+
 function disableFilters() {
   disableElement(mapFilters);
 }
@@ -17,51 +22,55 @@ function enableFilters() {
   enableElement(mapFilters);
 }
 
+function resetFilters() {
+  mapFilters.reset();
+}
+
 function filterOffer(item) {
   let isMatching = true;
 
-  for (const dropdownFilter of dropdownFilters) {
+  dropdownFilters.forEach((dropdownFilter) => {
     if (dropdownFilter.value !== 'any') {
       switch (dropdownFilter) {
 
         case housingType:
-          isMatching *= item.offer.type === housingType.value;
+          isMatching = isMatching && item.offer.type === housingType.value;
           break;
 
         case housingPrice:
           switch (housingPrice.value) {
             case 'low':
-              isMatching *= item.offer.price < 10000;
+              isMatching = isMatching && item.offer.price < PriceLimits.LOW;
               break;
             case 'middle':
-              isMatching *= item.offer.price >= 10000 && item.offer.price < 50000;
+              isMatching = isMatching && item.offer.price >= PriceLimits.LOW && item.offer.price < PriceLimits.MIDDLE;
               break;
             case 'high':
-              isMatching *= item.offer.price >= 50000;
+              isMatching = isMatching && item.offer.price >= PriceLimits.MIDDLE;
               break;
           }
           break;
 
         case housingRooms:
-          isMatching *= item.offer.rooms === Number(housingRooms.value);
+          isMatching = isMatching && item.offer.rooms === Number(housingRooms.value);
           break;
 
         case housingGuests:
-          isMatching *= item.offer.guests === Number(housingGuests.value);
+          isMatching = isMatching && item.offer.guests === Number(housingGuests.value);
           break;
       }
     }
-  }
+  });
 
-  for (const housingFeature of housingFeatures) {
+  housingFeatures.forEach((housingFeature) => {
     if (housingFeature.checked) {
       if (item.offer.features) {
-        isMatching *= item.offer.features.some((feature) => feature === housingFeature.value);
+        isMatching = isMatching && item.offer.features.some((feature) => feature === housingFeature.value);
       } else {
-        isMatching *= false;
+        isMatching = isMatching && false;
       }
     }
-  }
+  });
 
   return isMatching;
 }
@@ -72,8 +81,12 @@ function setFilterChange(callback) {
       callback();
     }
   });
+
+  mapFilters.addEventListener('reset', () => {
+    callback();
+  });
 }
 
 disableFilters();
 
-export { enableFilters, filterOffer, setFilterChange };
+export { enableFilters, resetFilters, filterOffer, setFilterChange };
