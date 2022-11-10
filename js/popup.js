@@ -1,4 +1,4 @@
-import { declineWordAccordingToNumber } from './util.js';
+import { getPluralForm } from './util.js';
 
 const TYPES_RUS = {
   flat: 'Квартира',
@@ -25,8 +25,8 @@ function createCustomPopup(point) {
   offerElement.querySelector('[data-price]').textContent = offer.price;
   offerElement.querySelector('.popup__type').textContent = TYPES_RUS[offer.type];
 
-  const declinedRooms = declineWordAccordingToNumber(offer.rooms, ['комната', 'комнаты', 'комнат']);
-  const declinedGuests = declineWordAccordingToNumber(offer.guests, ['гостя', 'гостей', 'гостей']);
+  const declinedRooms = getPluralForm(offer.rooms, ['комната', 'комнаты', 'комнат']);
+  const declinedGuests = getPluralForm(offer.guests, ['гостя', 'гостей', 'гостей']);
   offerElement.querySelector('.popup__text--capacity').textContent = `${offer.rooms} ${declinedRooms} для ${offer.guests} ${declinedGuests}`;
 
   offerElement.querySelector('.popup__text--time').textContent = `Заезд после ${offer.checkin}, выезд до ${offer.checkout}`;
@@ -58,11 +58,11 @@ function createCustomPopup(point) {
   if (offer.photos) {
     const photosListItem = photosList.querySelector('.popup__photo');
     photosListItem.remove();
-    for (let i = 0; i < offer.photos.length; i++) {
+    offer.photos.forEach((photo) => {
       const photoElement = photosListItem.cloneNode(true);
-      photoElement.src = offer.photos[i];
+      photoElement.src = photo;
       photosList.appendChild(photoElement);
-    }
+    });
   } else {
     photosList.remove();
   }
