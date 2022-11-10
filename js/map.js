@@ -87,20 +87,18 @@ function createSimilarMarkers(offers) {
   markerGroup.clearLayers();
 
   let counter = 0;
-  const filteredOffers = [];
 
-  for (let i = 0; i < offers.length; i++) {
-    if (filterOffer(offers[i])) {
-      filteredOffers.push(offers[i]);
+  offers.every((offer) => {
+    if (filterOffer(offer)) {
+      createSimilarMarker(offer, map);
       counter++;
-    }
 
-    if (counter === SIMILAR_OFFERS_COUNT) {
-      break;
+      if (counter === SIMILAR_OFFERS_COUNT) {
+        return false;
+      }
     }
-  }
-
-  filteredOffers.forEach((point) => createSimilarMarker(point, map));
+    return true;
+  });
 }
 
 function getSimilarOffers() {

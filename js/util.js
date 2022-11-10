@@ -1,4 +1,4 @@
-function declineWordAccordingToNumber(value, words) {
+function getPluralForm(value, words) {
   const remainderOfDivisionBy100 = Math.abs(value) % 100;
   const remainderOfDivisionBy10 = remainderOfDivisionBy100 % 10;
   if (remainderOfDivisionBy100 > 10 && remainderOfDivisionBy100 < 20) { return words[2]; }
@@ -30,4 +30,4 @@ function debounce(callback, timeoutDelay = 500) {
   };
 }
 
-export { declineWordAccordingToNumber, enableElement, disableElement, debounce };
+export { getPluralForm, enableElement, disableElement, debounce };
